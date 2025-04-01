@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "type": "commonjs",
   "scripts": {
-    "test": "mocha tests/*.js",
-    "dev": "nodemon app.js"
+    "test": "mocha tests/*.ts",
+    "dev": "nodemon app.ts"
   },
   "keywords": [],
   "author": "",
@@ -42,6 +42,14 @@
     "supertest": "^7.0.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.1",
+    "@types/express-session": "^1.18.1",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/node": "^22.13.17",
+    "@types/passport": "^1.0.17",
+    "@types/passport-local": "^1.0.38",
     "mocha": "^10.8.2"
   }
 }
