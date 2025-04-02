@@ -52,7 +52,7 @@
     "register": {
       "success": "Utilisateur enregistré avec succès",
       "error": "L'enregistrement a échoué",
-      "username_taken": "Le nom d'utilisateur est déjà utilisé",
+      "fullName_taken": "Le nom d'utilisateur est déjà utilisé",
       "email_registered": "L'email est déjà enregistré"
     }
   }

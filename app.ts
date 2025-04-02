@@ -10,11 +10,13 @@ import { createBullBoard } from "@bull-board/api";
 import { BullAdapter } from "@bull-board/api/bullAdapter";
 import { ExpressAdapter } from "@bull-board/express";
 import cors from "cors";
+import RoleRouter from './src/routes/role.route';
+import UserRouter from "./src/routes/user.route";
 
 dotenv.config();
 
 const app: Express = express();
-const Port = 5000;
+const Port = 8000;
 const sessionSecret = process.env.SESSION_SECRET || "default-secret-key";
 
 const fileUploadQueue = new Queue("file-uploads", {
@@ -49,6 +51,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/api/auth", authRoutes);
+app.use('/api/roles', RoleRouter);
+app.use("/api", UserRouter)
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ status: 500, message: err.message, data: null });

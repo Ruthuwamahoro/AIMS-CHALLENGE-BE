@@ -64,18 +64,45 @@ passport.deserializeUser(
 );
 
 router.post("/signup", async (req: Request, res: Response) => {
-  const { username, email, gender, telephone, password } = req.body;
+  const { username, fullName, email, gender, telephone, password } = req.body;
 
-  if (!username || !email || !gender || !telephone || !password) {
+  // // Username validation - exactly 8 alphanumeric characters
+  // const usernameRegex = /^[a-zA-Z0-9]{8}$/;
+  // if (!usernameRegex.test(username)) {
+  //   res.status(400).json({
+  //     status: 400,
+  //     message: i18next.t("auth.register.invalid_username", {
+  //       lng: (req as AuthenticatedRequest).language || "en",
+  //     }),
+  //     data: null,
+  //   });
+  //   return;
+  // }
+
+  // Password validation - at least 8 chars, uppercase, lowercase, number, special char
+  // const passwordRegex =
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  // if (!passwordRegex.test(password)) {
+  //   res.status(400).json({
+  //     status: 400,
+  //     message: i18next.t("auth.register.invalid_password", {
+  //       lng: (req as AuthenticatedRequest).language || "en",
+  //     }),
+  //     data: null,
+  //   });
+  //   return;
+  // }
+
+  if (!username || !fullName || !email || !gender || !telephone || !password) {
     res.status(400).json({
       status: 400,
-      message: i18next.t("common.error.missing_fields", {
-        lng: (req as AuthenticatedRequest).language || "en",
-      }),
+      message: "missing fields",
       data: null,
     });
     return;
   }
+
+  console.log("password", password)
 
   try {
     const [existingUsername, existingEmail] = await Promise.all([
@@ -86,9 +113,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     if (existingUsername) {
       res.status(400).json({
         status: 400,
-        message: i18next.t("auth.register.username_taken", {
-          lng: (req as AuthenticatedRequest).language || "en",
-        }),
+        message:"Username already taken",
         data: null,
       });
       return;
@@ -97,9 +122,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     if (existingEmail) {
       res.status(400).json({
         status: 400,
-        message: i18next.t("auth.register.email_registered", {
-          lng: (req as AuthenticatedRequest).language || "en",
-        }),
+        message: "Email already exists",
         data: null,
       });
       return;
@@ -108,6 +131,7 @@ router.post("/signup", async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       username,
+      fullName,
       email,
       gender,
       telephone,
@@ -118,50 +142,63 @@ router.post("/signup", async (req: Request, res: Response) => {
 
     res.status(201).json({
       status: 201,
-      message: i18next.t("auth.register.success", {
-        lng: (req as AuthenticatedRequest).language || "en",
-      }),
+      message: "User successfully registered",
       data: null,
     });
   } catch (error) {
+    const err = error as Error;
     res.status(500).json({
       status: 500,
-      message: i18next.t("auth.register.error", {
-        lng: (req as AuthenticatedRequest).language || "en",
-      }),
+      message: err.message,
       data: null,
     });
   }
 });
 
-router.post("/login", (req: Request, res: Response, next: NextFunction) => {
-  passport.authenticate(
-    "local",
-    { session: false },
-    (err: Error | null, user: any, info: { message: string }) => {
-      if (err) return next(err);
-      if (!user) {
-        res.status(400).json({
-          status: 400,
-          message: info.message,
-          data: null,
-        });
-        return;
-      }
+router.post("/login", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { identifier, password } = req.body;
 
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, {
-        expiresIn: "8h",
-      });
+    const user = await User.findOne({
+      $or: [{ email: identifier }, { username: identifier }],
+    });
 
-      res.status(200).json({
-        status: 200,
-        message: i18next.t("auth.login.success", {
-          lng: (req as AuthenticatedRequest).language || "en",
-        }),
-        data: token,
-      });
+    if (!user) {
+      res.status(401).json({ message: "Invalid credentials" });
+      return;
     }
-  )(req, res, next);
+
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      res.status(401).json({ message: "Invalid credentials" });
+      return;
+    }
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+        identifier: identifier,
+        role: user.role, // Add role to token payload
+      },
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "1d" }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    const err = error as Error;
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 });
 
 export default router;

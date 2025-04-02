@@ -52,7 +52,6 @@
     "register": {
       "success": "User registered successfully",
       "error": "Registration failed",
-      "username_taken": "Username is already in use",
       "email_registered": "Email is already registered"
     }
   }

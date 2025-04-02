@@ -57,7 +57,7 @@ Use this route to create a new user account.
 **Request Body**:  
 ```json
     {   
-        "username": "test",
+        "fullName": "test",
         "email": "test@gmail.com",
         "password": "Password123",
         "gender": "female",
