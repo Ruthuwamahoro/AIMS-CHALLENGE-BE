@@ -14,7 +14,7 @@ import cors from "cors";
 dotenv.config();
 
 const app: Express = express();
-const Port = process.env.PORT || 5000;
+const Port = 5000;
 const sessionSecret = process.env.SESSION_SECRET || "default-secret-key";
 
 const fileUploadQueue = new Queue("file-uploads", {
