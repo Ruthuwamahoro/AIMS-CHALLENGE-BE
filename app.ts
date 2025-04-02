@@ -16,7 +16,7 @@ import UserRouter from "./src/routes/user.route";
 dotenv.config();
 
 const app: Express = express();
-const Port = 8000;
+const Port = 5000;
 const sessionSecret = process.env.SESSION_SECRET || "default-secret-key";
 
 const fileUploadQueue = new Queue("file-uploads", {

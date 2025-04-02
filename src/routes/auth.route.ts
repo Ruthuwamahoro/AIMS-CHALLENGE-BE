@@ -66,33 +66,6 @@ passport.deserializeUser(
 router.post("/signup", async (req: Request, res: Response) => {
   const { username, fullName, email, gender, telephone, password } = req.body;
 
-  // // Username validation - exactly 8 alphanumeric characters
-  // const usernameRegex = /^[a-zA-Z0-9]{8}$/;
-  // if (!usernameRegex.test(username)) {
-  //   res.status(400).json({
-  //     status: 400,
-  //     message: i18next.t("auth.register.invalid_username", {
-  //       lng: (req as AuthenticatedRequest).language || "en",
-  //     }),
-  //     data: null,
-  //   });
-  //   return;
-  // }
-
-  // Password validation - at least 8 chars, uppercase, lowercase, number, special char
-  // const passwordRegex =
-  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  // if (!passwordRegex.test(password)) {
-  //   res.status(400).json({
-  //     status: 400,
-  //     message: i18next.t("auth.register.invalid_password", {
-  //       lng: (req as AuthenticatedRequest).language || "en",
-  //     }),
-  //     data: null,
-  //   });
-  //   return;
-  // }
-
   if (!username || !fullName || !email || !gender || !telephone || !password) {
     res.status(400).json({
       status: 400,
